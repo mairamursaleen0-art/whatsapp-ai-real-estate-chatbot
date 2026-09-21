@@ -1,3 +1,5 @@
+<img width="638" height="284" alt="Screenshot 2026-09-21 142911" src="https://github.com/user-attachments/assets/aafbc271-47bf-42b3-8576-a97517b63a2f" />
+
 # WhatsApp AI Real Estate Chatbot
 
 An AI-powered WhatsApp chatbot built with **n8n** and **Green API** to automate real estate customer inquiries and provide instant, intelligent responses.
@@ -53,4 +55,5 @@ The goal of this project is to demonstrate how AI-powered automation can improve
 ---
 
 **Built with n8n + AI + Green API**
-<img width="1920" height="1006" alt="06 08 2026_05 14 59_REC" src="https://github.com/user-attachments/assets/e1444a9a-ed05-4bcd-a4f3-437a27fef2d7" />
+
+
