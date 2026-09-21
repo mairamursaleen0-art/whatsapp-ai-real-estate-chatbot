@@ -1,0 +1,685 @@
+{
+  "name": "Whatsapp Ai agent",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messageData.textMessageData.textMessage }}",
+        "options": {
+          "systemMessage": "You are a professional AI Real Estate Assistant.\nWhenever a customer asks a question about properties, pricing, booking, policies, or company information, search the connected Google Docs Knowledge Base first. Use the retrieved information to answer accurately. Do not answer from your own knowledge unless the Knowledge Base does not contain the required information.\n\nYour job is to help customers with accurate and helpful information about our real estate company.\n\nIMPORTANT RULES:\n\n1. Always use the connected Knowledge Base as your primary source of information.\n2. Answer questions only using the information available in the Knowledge Base.\n3. If the information is not available, politely tell the customer:\n   \"I couldn't find that information in our knowledge base. A human representative will assist you.\"\n\n4. Be friendly, professional, and concise.\n\n5. You can answer questions about:\n   - Property details\n   - Property prices\n   - Property locations\n   - Property availability\n   - Booking process\n   - Installment plans\n   - Company information\n   - Policies\n   - FAQs\n   - Required documents\n   - Contact information\n\n6. Never invent prices, policies, or property details.\n\n7. If the customer wants to purchase or book a property, collect the following information one by one:\n   - Full Name\n   - Email Address\n   - Property Name\n   - Budget\n   - phone number\n\n\n8. If any information is missing, politely ask only for the missing field.\n\n9. After all four details have been collected, confirm the information with the customer before submitting.\n\nExample:\n\nCustomer:\nI want to book a plot.\n\nAssistant:\nI'd be happy to help. Before proceeding, please provide:\n• Your Full Name\n• Email Address\n• Property Name\n• Budget\n- phone number\nInstructions:\ndo not ask for name email phone all tha time only ask one time in chat when the customer is abou to book the plot if the customer is onlu questioning aboutthe comapny and the plots do not ask for name and other detaiks just provide them details about the company and when customer say hello Hye just say greetings and said our company name intro nothing else like we are offering this and that etccccc when customer asks what are your services offering only when answer them. do not ask anything extra if the customer ask for price tell them the price of the plots or for installments say yes \nInstaructions :\nGive detailed answers to every quewstions\n\n\n\n10. After the customer confirms all details, reply only with:\n\n\"Thank you! Your inquiry has been successfully submitted. Our real estate consultant will contact you shortly.\"\n\nDo not ask for the same information again if it has already been provided.\nAlways maintain a professional and helpful tone.\n After you get done by getting required information \n- name\n- email\n-phone number\n-property\n-budget\nsimply save this data in sheet tool that is Prime Estates CRM\nyou don't have to say for details in every message just ask when the customer is about to  final the t project"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        144,
+        -176
+      ],
+      "id": "5d4fd120-1937-4d39-9d1e-c0dffb22e3a1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-safeguard-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        272
+      ],
+      "id": "35c60843-8d7a-4bdc-a949-fc0eee3ffb12",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "tDW7CwBxQLZhJhfO",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $workflow.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -160,
+        272
+      ],
+      "id": "ff1e2a9d-706b-4b0d-ac2f-c378b9e58e9e",
+      "name": "Simple Memory",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('GREENAPI Trigger').item.json.senderData.chatId }}",
+        "quotedMessageId": "=",
+        "message": "={{ $('AI Agent').item.json.output }}"
+      },
+      "type": "@green-api/n8n-nodes-whatsapp-greenapi.greenapi",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -64
+      ],
+      "id": "0992f776-a5f8-4d0f-9ba8-9a773caacfb8",
+      "name": "Send message",
+      "credentials": {
+        "greenApiAuthApi": {
+          "id": "BnqCP03Y4dtbLaH1",
+          "name": "Green-API account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1Eco9rH07ztUN350adrmaLPtBz6Q7kSm6_9LYxVc6fRY"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        272
+      ],
+      "id": "ac92e643-495b-42ad-9ce8-c1ea97a314ac",
+      "name": "company profile",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "1Q4geet7cPkUmvPY",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1BUWkA_6OuKdZUz5d03VkMgazNo8xCMsp_WtwLn9XqLY"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        112,
+        272
+      ],
+      "id": "3719aac9-4cfc-4e31-bb26-bdafad613ad5",
+      "name": "FAQs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "1Q4geet7cPkUmvPY",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1K9ZKiv-LoSvP2BleKeY-ykwzWvMMdK20R2s1SSFVxwg"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        272,
+        272
+      ],
+      "id": "da1d09b2-04a3-4c41-98f3-94f39f3eec6b",
+      "name": "Property catalog",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "1Q4geet7cPkUmvPY",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1WqvV3ba7Ee7dKUNgTNr9NpEHP_ANYe-pF_d50NtCOJQ"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        416,
+        272
+      ],
+      "id": "36160950-59f6-45c2-9fe4-e4067e540911",
+      "name": "Booking Process",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "1Q4geet7cPkUmvPY",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1pEqYah4u5w3gUNKc-GHltC1RSztn1__Z8_0vqzdB8oc"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        544,
+        272
+      ],
+      "id": "348f7456-53a5-4db5-8ba3-f9782e836db3",
+      "name": "Policies",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "1Q4geet7cPkUmvPY",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "1NiI6DO_H_70U4-xu4ZsDglT9KSOmgWg1EvEzbzLrqVE"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        672,
+        272
+      ],
+      "id": "273ff165-9445-4ab8-8425-37a5a2aae657",
+      "name": "Knowledge Base",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "1Q4geet7cPkUmvPY",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1b3apf8IqBMEXVsoN29BhI7O5UHaq-DvsoDY9_bYNX3s",
+          "mode": "list",
+          "cachedResultName": "Prime Estates CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1b3apf8IqBMEXVsoN29BhI7O5UHaq-DvsoDY9_bYNX3s/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1b3apf8IqBMEXVsoN29BhI7O5UHaq-DvsoDY9_bYNX3s/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
+            "Email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email', ``, 'string') }}",
+            "Phone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone', ``, 'string') }}",
+            "Property": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Property', ``, 'string') }}",
+            "Budget": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Budget', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Property",
+              "displayName": "Property",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        272
+      ],
+      "id": "0ec0df3a-faf0-4d6c-9024-7aa4575b6390",
+      "name": "Prime Estates CRM",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Tp8cbAjt9GhBe81y",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "40f9a805-7d03-4475-b86c-c7794db60d8f",
+              "leftValue": "={{ $json.output.Name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "d0d9330f-51d7-4951-bfa9-b62ce0d6fff1",
+              "leftValue": "={{ $json.output.Email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "0260df3c-f8b3-4325-b536-fadae964beb0",
+              "leftValue": "={{ $json.output['Phone number'] }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c99e9ac3-4627-4813-bee7-78ce91ff01f4",
+              "leftValue": "={{ $json.output.Property }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d976c627-6b54-4cfd-87f1-fd0ea2459fd1",
+              "leftValue": "={{ $json.output.Budget }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        992,
+        -304
+      ],
+      "id": "881a9b78-6fa8-49e6-bb94-cf9d329814a4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Name",
+              "description": "customer name"
+            },
+            {
+              "name": "Email",
+              "description": "customer email address"
+            },
+            {
+              "name": "Phone number",
+              "type": "number",
+              "description": "customer phone number"
+            },
+            {
+              "name": "Property",
+              "description": "Customer property"
+            },
+            {
+              "name": "Budget",
+              "description": "customer budget"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        -304
+      ],
+      "id": "2d2d5173-7d85-4cd1-8f30-54630a4f50c6",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3.6-27b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        544,
+        -96
+      ],
+      "id": "3208389a-cd4e-4a96-a2e0-c96650a18260",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "tDW7CwBxQLZhJhfO",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "webhookType": [
+          "incomingMessageReceived"
+        ]
+      },
+      "type": "@green-api/n8n-nodes-whatsapp-greenapi.greenapiTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -176
+      ],
+      "id": "049fffde-1ece-46cc-b580-b1ede0f84335",
+      "name": "GREENAPI Trigger",
+      "webhookId": "af670f3d-65ee-496e-bc95-a894781880eb",
+      "credentials": {
+        "greenApiAuthApi": {
+          "id": "g3eGndb6fhsPZw14",
+          "name": "Green-API account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "raomaira776@gmail.com",
+        "subject": "New Lead",
+        "emailType": "text",
+        "message": "=New Lead\n\n{{ $('Information Extractor').item.json.output.Name }}\n{{ $('Information Extractor').item.json.output.Email }}\n{{ $('Information Extractor').item.json.output['Phone number'] }}\n{{ $('Information Extractor').item.json.output.Property }}\n{{ $('Information Extractor').item.json.output.Budget }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        -320
+      ],
+      "id": "7e9c950f-5e97-4ba3-9322-c24362683d9a",
+      "name": "Send a message",
+      "webhookId": "a4bc2c42-ed65-482a-b3d7-b1de77d55251",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JWUXkm10RGD1oy28",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Information Extractor').item.json.output.Email }}",
+        "subject": "Prime Real Estate",
+        "emailType": "text",
+        "message": "=Dear {{ $('Information Extractor').item.json.output.Name }}\nThanks for showing interest in our company we will contact you soon for further details.\n\nregards: Prime Real Estate",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        112
+      ],
+      "id": "cd577468-5f33-494d-9637-49864b9cafb2",
+      "name": "Send a message1",
+      "webhookId": "9efe8db5-330e-4ddb-995e-265a4bedcb91",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "JWUXkm10RGD1oy28",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "company profile": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Property catalog": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Booking Process": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Policies": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge Base": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prime Estates CRM": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        []
+      ]
+    },
+    "GREENAPI Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "375a9d1f-f60b-46d7-986f-1f1653804857",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7779f852dc51c35c51c1b61f6f29411a6cd0c2672b0b73dd2646ed9d495af908"
+  },
+  "nodeGroups": [],
+  "id": "DBHS0kwophSiUc55",
+  "tags": []
+}
